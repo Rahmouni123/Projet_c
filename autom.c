@@ -153,7 +153,7 @@ int verifierMot( Automate* automate, Noeud mot){
     courant= courant -> suivant;
   }
   for (int k = 0; k < automate->nbE; k++) {
-      if (etatcourant == automate->nbE){
+      if (etatcourant == automate->nbE-1){
         printf("mot reconnu\n");
 
         return 1; //mot reconnu
