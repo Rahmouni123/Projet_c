@@ -9,7 +9,6 @@
 typedef struct {
     int initial_state;
     int final_state;
-    // Ajoutez d'autres champs nécessaires ici
 } Transition;
 
 // Structure pour les automates
@@ -26,7 +25,6 @@ struct Noeud {
 };
 typedef struct Noeud *Noeud;
 
-// Fusion des structures Automate et Automaton
 typedef struct {
     int nbE;
     int nSy;
@@ -92,37 +90,167 @@ Automaton *completing(Automaton *automaton) {
     return new_automaton;
 }
 
-// Fusion des fonctions du second code
-void creerAutomate(Automate *automate) {
-    // ... (code du second bloc)
-}
+void creerAutomate (Automate*automate){
+  int i,j;
 
-void remplirAutomate(Automate *automate) {
-    // ... (code du second bloc)
-}
+  printf("Quel est le nombre d'état?\n" );
+  scanf("%d", &(automate->nbE));
 
-void afficherAutomate(Automate *automate) {
-    // ... (code du second bloc)
-}
+  printf("Quel est le nombre de symboles?\n" );
+  scanf("%d", &(automate->nSy));
 
-void saisirtransition(Automate *automate) {
-    // ... (code du second bloc)
-}
+  printf("Quel est le nombre de transistions ?");
+  scanf("%d", &(automate->transition));
 
+  //alloction de la memoire pour les lignes
+  automate->mat=(int***)calloc(automate->nbE,sizeof(int));
+
+   //alloction de la memoire pour les colones
+    for ( i = 0; i < automate->nbE; i++) {
+
+     automate->mat[i]=(int**)calloc(automate->nbE,sizeof(int));
+     }
+
+          for ( i = 0; i < automate->nbE; i++) {
+
+                    for (j = 0; j < automate->nSy; j++) {
+                      automate->mat[i][j]=(int*)calloc(automate->nSy,sizeof(int));
+                              }
+                    }
+
+  };
+
+//remplir les champs de l'automate
+void remplirAutomate(Automate*automate){
+  int i, j,z;
+
+  for ( i = 0; i <automate->nbE; i++) {
+      for (j=0;j <automate->nSy; j++) {
+          for (z = 0; z < automate->nbE; z++) {
+          printf("valeur de mat[q%d][a%d][q%d]\n", i,j,z);
+          scanf("%d", &(automate->mat[i][j][z]));
+                        }
+       }
+  }
+
+
+};
+//afficher l'Automate
+void afficherAutomate (Automate*automate){
+  int i,j,z;
+  for( i=0; i< automate->nbE; i++) {
+
+    for( j=0;j<automate->nSy; j++){
+       for(z=0; z< automate->nSy; z++){
+          if( automate->mat[i][j][z] == 1){
+          printf("[Q%d][A%d][Q%d]=[%d]\t", i,j,z, automate->mat[i][j][z] );
+             }
+         }
+    }
+      printf("\n");
+  }
+
+};
+
+void saisirtransition(Automate*automate){
+    int i, from, to, symbole;
+
+    printf("Saisie des transition:\n");
+    for ( i = 0; i < automate->transition; i++) {
+      printf("Transition %d: \n",i+1 );
+
+      printf(" Etat de départ:");
+      scanf("%d", &from );
+
+      printf("Symbole: \n");
+      scanf("%d", &symbole);
+
+      printf("Etat d'arrivée:\n");
+      scanf("%d", &to);
+      // vérifications du nombre des états et symbole
+      if (from >=0 && from < automate->nbE && to >=0 && to < automate->nbE &&
+      symbole >=0 && symbole < automate->nSy) {
+        automate->mat[from][symbole][to]= 1;
+
+      }
+      else {
+         printf("Erreur: Etat ou symbole hors des limites\n");
+         -- i; //retour à la transition précédente
+      }
+    }
+
+
+};
+
+//liberer mémoire de la liste
 void libererListe(Noeud tete) {
-    // ... (code du premier bloc)
+    Noeud courant = tete;
+    while (courant != NULL) {
+        Noeud temp = courant;
+        courant = courant->suivant;
+        free(temp);
+    }
 }
 
-int verifierMot(Automate *automate, Noeud mot) {
-    // ... (code du second bloc)
+// Fonction qui vérifier un mot
+int verifierMot( Automate* automate, Noeud mot){
+  int etatcourant = 0; // État initial
+  //int i = 0;
+  Noeud courant = mot;
+
+
+  while (courant !=NULL){
+
+    int symbole = courant -> valeur;
+    if( symbole< 0 || symbole >= automate->nSy){
+        printf("Erreur : Symbole non reconnu.\n");
+        libererListe(mot);
+        return 0;
+    }
+    int etatsuivant = -1;
+    // Chercher une transition depuis l'état courant avce le symbole donné
+    for (int j = 0; j < automate->nbE; j++) {
+      if (automate->mat[etatcourant][symbole][j] == 1){
+          etatsuivant = j;
+          break;
+      }
+
+    }
+    if (etatsuivant == -1) {
+      //aucune transistions
+      return 0; // mot non reconnu
+    }
+    etatcourant = etatsuivant;
+    //++i;
+    courant= courant -> suivant;
+  }
+  for (int k = 0; k < automate->nbE; k++) {
+      if (etatcourant == automate->nbE-1){
+        printf("mot reconnu\n");
+
+        return 1; //mot reconnu
+      }
+  }
+  printf("mot non reconnu \n");
+  libererListe(mot);
+  return 0; //mot non reconnu
 }
 
-void supprimerAutomate(Automate *automate) {
-    // ... (code du second bloc)
-}
+
+//liberation de la mémoire
+ void supprimerAutomate(Automate*automate){
+   int i,j;
+  for (i = 0; i < automate->nbE; i++) {
+    for (j = 0; j< automate->nSy; j++) {
+        free(automate->mat[i][j]);
+    }
+    free(automate->mat[i]);
+   }
+   //free(automate->mat);
+};
+
 
 int main() {
-    // Utilisez ces fonctions comme des exemples
     Automaton *automaton = /* Initialiser votre automate ici */;
     char *word = /* Initialiser votre mot ici */;
 
@@ -140,7 +268,6 @@ int main() {
 
     Automaton *completed_automaton = completing(automaton);
 
-    // Libérez la mémoire à la fin
     free(automaton->transitions);
     free(automaton);
     free(completed_automaton->transitions);
