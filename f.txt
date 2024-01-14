@@ -1,0 +1,7 @@
+   int nbE = 2;
+   //nb de symbole
+   int nSy=2;
+   //nb de transition
+   int transition=1;
+  // matrice à 3 dimensions
+   int ***mat= { {{ 0 ,1}, {0, 0}}, { {0, 0}, {0, 0}}}
